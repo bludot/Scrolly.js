@@ -7,7 +7,7 @@ function scrolly(node, e)
 		{
 			node.running = true;
 			clearInterval(window.timeout);
-			node.parentNode.querySelector('.scrollbar').style.opacity = '1';
+			node.parentNode.querySelector('.scrollbar').style.opacity = 1;
 			window.tempit = node;
 			node.scrollTop += -(e.detail * -10) ? -(e.detail * -10) : -(e.wheelDelta / 5);
 			node.parentNode.querySelector('.scrollbar').style.height = (node.clientHeight / node.scrollHeight) * node.clientHeight + 'px';
@@ -64,11 +64,11 @@ function scrolly(node, e)
 	node.onmousemove = function(e) {
 		if(e.clientX>(node.clientWidth-10))
 		{
-			node.parentNode.querySelector('.scrollbar').style.opacity = '1';
+			node.parentNode.querySelector('.scrollbar').style.opacity = 1;
 		} else {
 			if(node.running === false)
 			{
-				node.parentNode.querySelector('.scrollbar').style.opacity = '0';
+				node.parentNode.querySelector('.scrollbar').style.opacity = 0;
 			}
 		}
 	};
@@ -101,7 +101,7 @@ function scrolly(node, e)
 			node.parentNode.querySelector('.scrollbar').style.opacity = 0;
 		}
 		node.parentNode.querySelector('.scrollbar').onmouseover = function() {
-			node.parentNode.querySelector('.scrollbar').style.opacity = '1';
+			node.parentNode.querySelector('.scrollbar').style.opacity = 1;
 		}
 	};
 }
