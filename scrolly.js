@@ -23,7 +23,19 @@ function scrolly(node, e)
 	};
 	var div = document.createElement('div');
 	div.className = 'content';
-	var tmpstyle = window.getComputedStyle(node).cssText;
+	var className  = node.className;
+	var tmpstyle = '';
+	function getStyle(className) {
+		var classes = document.styleSheets[0].rules || document.styleSheets[0].cssRules;
+		for(var x=0;x<classes.length;x++) {
+			if(classes[x].selectorText === className) {
+				return (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText;
+			}
+		}
+	}
+	tmpstyle = getStyle('.test');
+	console.log(tmpstyle);
+	tmpstyle = tmpstyle.split('{ ')[1].split(' }')[0];
 	div.style.cssText = tmpstyle;
 	div.style.overflow = 'hidden';
 	var scrollC = document.createElement('div');
