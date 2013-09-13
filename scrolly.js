@@ -34,7 +34,6 @@ function scrolly(node, e)
 		}
 	}
 	tmpstyle = getStyle('.test');
-	console.log(tmpstyle);
 	tmpstyle = tmpstyle.split('{ ')[1].split(' }')[0];
 	div.style.cssText = tmpstyle;
 	div.style.overflow = 'hidden';
@@ -77,13 +76,11 @@ function scrolly(node, e)
 		document.onselectstart = function(e) {
 			return false;
 		};
-		console.log('down');
 		var tempY = e.pageY;
 		var tempTop = node.parentNode.querySelector('.scrollbar').offsetTop;
 		window.onmousemove = function(e) {
 			var styleTop = tempTop-(tempY-e.pageY);
 			node.parentNode.querySelector('.scrollbar').style.top = (styleTop > 0 && styleTop < (node.clientHeight - node.parentNode.querySelector('.scrollbar').clientHeight)) ? styleTop + 'px' : node.parentNode.querySelector('.scrollbar').offsetTop;
-			console.log(tempTop - (tempY - e.pageY));
 			var setTop = (node.parentNode.querySelector('.scrollbar').offsetTop / node.parentNode.querySelector('.scrollbar').clientHeight) * node.clientHeight;
 			node.scrollTop = setTop > 0 ? setTop : 0;
 		};
