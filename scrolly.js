@@ -15,7 +15,7 @@ function scrolly(node, e)
 			window.timeout = setTimeout(function(e)
 			{
 				delete node.running;
-				node.parentNode.querySelector('.scrollbar').style.opacity = '0';
+				node.parentNode.querySelector('.scrollbar').style.opacity = 0;
 			},500);
 		}
 		e.preventDefault();
@@ -98,7 +98,7 @@ function scrolly(node, e)
 	node.onmouseout = function(e) {
 		if(!node.running)
 		{
-			node.parentNode.querySelector('.scrollbar').style.opacity = '0';
+			node.parentNode.querySelector('.scrollbar').style.opacity = 0;
 		}
 		node.parentNode.querySelector('.scrollbar').onmouseover = function() {
 			node.parentNode.querySelector('.scrollbar').style.opacity = '1';
