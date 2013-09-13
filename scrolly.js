@@ -9,9 +9,9 @@ function scrolly(node, e)
 			clearInterval(window.timeout);
 			node.parentNode.querySelector('.scrollbar').style.opacity = '1';
 			window.tempit = node;
-			node.scrollTop+= -(e.detail * -10) ? -(e.detail * -10) : -(e.wheelDelta/5);
-			node.parentNode.querySelector('.scrollbar').style.height = (node.clientHeight/node.scrollHeight)*node.clientHeight+'px';
-			node.parentNode.querySelector('.scrollbar').style.top = (node.scrollTop/node.clientHeight)*node.parentNode.querySelector('.scrollbar').clientHeight+'px';
+			node.scrollTop += -(e.detail * -10) ? -(e.detail * -10) : -(e.wheelDelta / 5);
+			node.parentNode.querySelector('.scrollbar').style.height = (node.clientHeight / node.scrollHeight) * node.clientHeight + 'px';
+			node.parentNode.querySelector('.scrollbar').style.top = (node.scrollTop / node.clientHeight) * node.parentNode.querySelector('.scrollbar').clientHeight + 'px';
 			window.timeout = setTimeout(function(e)
 			{
 				delete node.running;
@@ -54,7 +54,7 @@ function scrolly(node, e)
 	node = tmpdiv;
 	node.style.width = 'auto';
 	e = e || window.event;
-	node.parentNode.querySelector('.scrollbar').style.height = (node.clientHeight/node.scrollHeight)*node.clientHeight+'px';
+	node.parentNode.querySelector('.scrollbar').style.height = (node.clientHeight / node.scrollHeight) * node.clientHeight + 'px';
 	node.addEventListener('mousewheel',  function(e) {
 		scroll(node, ['body'], e);
 	}, false);
@@ -82,10 +82,10 @@ function scrolly(node, e)
 		var tempTop = node.parentNode.querySelector('.scrollbar').offsetTop;
 		window.onmousemove = function(e) {
 			var styleTop = tempTop-(tempY-e.pageY);
-			node.parentNode.querySelector('.scrollbar').style.top = (styleTop>0 && styleTop<(node.clientHeight-node.parentNode.querySelector('.scrollbar').clientHeight)) ? styleTop+'px' : node.parentNode.querySelector('.scrollbar').offsetTop;
-			console.log(tempTop-(tempY-e.pageY));
-			var setTop = (node.parentNode.querySelector('.scrollbar').offsetTop/node.parentNode.querySelector('.scrollbar').clientHeight)*node.clientHeight;
-			node.scrollTop = setTop>0 ? setTop : 0;
+			node.parentNode.querySelector('.scrollbar').style.top = (styleTop > 0 && styleTop < (node.clientHeight - node.parentNode.querySelector('.scrollbar').clientHeight)) ? styleTop + 'px' : node.parentNode.querySelector('.scrollbar').offsetTop;
+			console.log(tempTop - (tempY - e.pageY));
+			var setTop = (node.parentNode.querySelector('.scrollbar').offsetTop / node.parentNode.querySelector('.scrollbar').clientHeight) * node.clientHeight;
+			node.scrollTop = setTop > 0 ? setTop : 0;
 		};
 		window.onmouseup = function(e) {
 			node.running = false;
