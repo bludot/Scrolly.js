@@ -27,8 +27,8 @@ http://bludotos.com/test/scrollbar/test.html
 To Do List:
 ===========
 
-- [ ] fix Scrolly.js on body tag.
+- [X] fix Scrolly.js on body tag. (not 100% fixed. small bugs)
 - [ ] enable black list scrolling.
 - [ ] add horizontal scrolling.
 - [ ] make sure works correctly in firefox.
-- [x] make css styling work correctly with id, classname, and neither.
+- [X] make css styling work correctly with id, classname, and neither.
