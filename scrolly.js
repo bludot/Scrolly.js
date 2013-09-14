@@ -109,13 +109,14 @@ function scrolly(node, e)
 	
 	// create container to hold the scrollbar and content
 	var div = document.createElement('div');
-	div.className = 'content';
+	div.className = node.className;
 	
 	// function to get the style of the content
 	var getStyleClass = function(className) {
 		var classes = document.styleSheets[0].rules || document.styleSheets[0].cssRules;
 		for(var x=0;x<classes.length;x++) {
-			if(classes[x].selectorText === className) {
+			var tmp = classes[x].selectorText.split('{');
+			if(tmp[0].split(' ')[tmp[0].split(' ').length-1] === className) {
 				return (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText;
 			}
 		}
@@ -124,7 +125,8 @@ function scrolly(node, e)
 	var getStyleId = function(id) {
 		var classes = document.styleSheets[0].rules || document.styleSheets[0].cssRules;
 		for(var x=0;x<classes.length;x++) {
-			if(classes[x].selectorText === id) {
+			var tmp = classes[x].selectorText.split('{');
+			if(tmp[0].split(' ')[tmp[0].split(' ').length-1] === id) {
 				return (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText;
 			}
 		}
@@ -133,39 +135,46 @@ function scrolly(node, e)
 	var tmpstyle = '';
 	
 	// get classname of the node to get the style
-	if(node.className.length > 0)
+	if(node.className)
 	{
 		var className  = node.className;
 		tmpstyle = getStyleClass('.'+className);
+		console.log(tmpstyle);
 		tmpstyle = tmpstyle.split('{ ')[1].split(' }')[0];
-	} else if(node.id.length > 0)
+	} else if(node.id)
 	{
 		var id = node.id;
 		tmpstyle = getStyleClass('#'+id);
+		console.log(tmpstyle);
 		tmpstyle = tmpstyle.split('{ ')[1].split(' }')[0];
-	} else {
+	} else if(!node.className && !node.id) {
 		tmpstyle = window.getComputedStyle(node).cssText;
+		console.log(tmpstyle);
 	}
 	
 	// set style of content to container
 	div.style.cssText = tmpstyle;
 	div.style.overflow = 'hidden';
+	div.style.marginLeft = 0;
+	div.style.marginRight = 0;
 	
 	// add scrollcontainer
 	var scrollC = document.createElement('div');
 	scrollC.className = 'scrollbar-container';
-	scrollC.style.cssText = 'right:0px;';
+	scrollC.style.cssText = 'position: absolute;top: 0px;bottom: 0px;right: 10px;width: 10px;padding: 0px;right:0px;';
 	
 	// add scrollbar
 	var scrollB = document.createElement('div');
 	scrollB.className = 'scrollbar';
-	scrollB.style.cssText = 'height:10px;top:0px;';
+	scrollB.style.cssText = 'position: relative;width: 6px;height: 100%;right: 0px;background: #222;border: 1px solid #C1C1C1;z-index: 3;top: 0px;opacity:0;-webkit-transition: opacity .5s ease;height:10px;top:0px;';
 	
 	// copy content node to add to the container
 	var tmpdiv = node.cloneNode(true);
+	tmpdiv.className = '';
 	
 	// restore style
 	tmpdiv.style.cssText = tmpstyle;
+	//tmpdiv.style.top = '-100%';
 	
 	// create container with scrollbar and content
 	node.parentNode.appendChild(div);
@@ -173,6 +182,7 @@ function scrolly(node, e)
 	div.appendChild(scrollC);
 	scrollC.appendChild(scrollB);
 	div.appendChild(tmpdiv);
+	tmpdiv.style.height = div.clientHeight + 'px';
 	node = tmpdiv;
 	node.style.width = 'auto';
 	
