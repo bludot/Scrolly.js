@@ -1,7 +1,7 @@
 function scrolly(node, e)
 {
 	var body = false;
-	if(node == document.body)
+	if(node === document.body)
 	{
 		body = true;
 	}
@@ -186,9 +186,12 @@ function scrolly(node, e)
 	{
 		node.parentNode.appendChild(div);
 		node.parentNode.removeChild(node);
+		div.appendChild(scrollC);
+		scrollC.appendChild(scrollB);
 		div.appendChild(tmpdiv);
 		tmpdiv.style.height = div.clientHeight + 'px';
 		node = tmpdiv;
+		node.style.width = 'auto';
 	} else {
 		
 		// body cannot be contained or be a container
@@ -196,21 +199,19 @@ function scrolly(node, e)
 		// copy body elements
 		var tmpbody = node.innerHTML;
 		
-		// copy container for later use
+		// make new container for content twice
 		var divC = div.cloneNode(true);
 		
 		// empty body innerHTML
 		node.innerHTML = '';
 		
-		// add one container
+		// add both containers
 		node.appendChild(div);
 		
 		// add second container to hold body contents
-		// now we have our normal outside container and inside content
-		div.appendChild(divC)
+		div.appendChild(divC);
 		
-		// set second container styles to make sure we can scroll
-		// enables scrolling
+		// set second container styles to enable scrolling
 		divC.style.position = 'relative';
 		divC.innerHTML = tmpbody;
 		node.style.position = 'relative';
@@ -218,7 +219,6 @@ function scrolly(node, e)
 		node.children[0].style.position = 'relative';
 		node.children[0].style.height = window.innerHeight + 'px';
 		
-		// the rest is default except defining the node
 		// add scrollbars to 1st container.
 		node.appendChild(scrollC);
 		scrollC.appendChild(scrollB);
