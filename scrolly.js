@@ -96,12 +96,12 @@ function scrolly(node, e)
 	
 	// mousemove event for content
 	var mousemove = function(e) {
-		if(e.clientX>(node.clientWidth-10))
+		if(!node.running)
 		{
-			scrollB.style.opacity = 1;
-		} else {
-			if(node.running === false)
+			if(e.clientX>(node.clientWidth-10))
 			{
+				scrollB.style.opacity = 1;
+			} else {
 				scrollB.style.opacity = 0;
 			}
 		}
@@ -110,7 +110,6 @@ function scrolly(node, e)
 	
 	// mousedown event for scrollbar mouse down
 	var mousedown = function(e) {
-		
 		// prevent text selection
 		e.preventDefault();
 		
@@ -361,20 +360,23 @@ function scrolly(node, e)
 	//  set scrollbar height
 	scrollB.style.height = (node.clientHeight / node.scrollHeight) * node.clientHeight + 'px';
 	
+	// set style of scrollbar
+	scrollB.style.top = 0+'px';
+	
 	// on mouse wheeel
-	node.addEventListener('mousewheel',  function(e) {
+	node.parentNode.addEventListener('mousewheel',  function(e) {
 		scroll(node, e);
 	}, false);
-	node.addEventListener('DOMMouseScroll',  function(e) {
+	node.parentNode.addEventListener('DOMMouseScroll',  function(e) {
 		scroll(node, e);
 	}, false);
 	
 	// on mouse move for showing scrollbar near the side
-	node.addEventListener('mousemove', mousemove, false);
+	node.parentNode.addEventListener('mousemove', mousemove, false);
 	
 	//  on mouse down for clicking on the scrollbar
 	scrollB.addEventListener('mousedown', mousedown, false);
 	
 	// mouse out hide scrollbar
-	node.addEventListener('mouseout', mouseout, false);
+	node.parentNode.addEventListener('mouseout', mouseout, false);
 }
