@@ -1,5 +1,10 @@
 function scrolly(node, e)
 {
+	var body = false;
+	if(node == document.body)
+	{
+		body = true;
+	}
 	// function to scroll on mouse wheel
 	var scroll = function(node, black, e)
 	{
@@ -177,14 +182,59 @@ function scrolly(node, e)
 	//tmpdiv.style.top = '-100%';
 	
 	// create container with scrollbar and content
-	node.parentNode.appendChild(div);
-	node.parentNode.removeChild(node);
-	div.appendChild(scrollC);
-	scrollC.appendChild(scrollB);
-	div.appendChild(tmpdiv);
-	tmpdiv.style.height = div.clientHeight + 'px';
-	node = tmpdiv;
-	node.style.width = 'auto';
+	if(!body)
+	{
+		node.parentNode.appendChild(div);
+		node.parentNode.removeChild(node);
+		div.appendChild(tmpdiv);
+		tmpdiv.style.height = div.clientHeight + 'px';
+		node = tmpdiv;
+	} else {
+		
+		// body cannot be contained or be a container
+		
+		// copy body elements
+		var tmpbody = node.innerHTML;
+		
+		// copy container for later use
+		var divC = div.cloneNode(true);
+		
+		// empty body innerHTML
+		node.innerHTML = '';
+		
+		// add one container
+		node.appendChild(div);
+		
+		// add second container to hold body contents
+		// now we have our normal outside container and inside content
+		div.appendChild(divC)
+		
+		// set second container styles to make sure we can scroll
+		// enables scrolling
+		divC.style.position = 'relative';
+		divC.innerHTML = tmpbody;
+		node.style.position = 'relative';
+		node.style.height = window.innerHeight + 'px';
+		node.children[0].style.position = 'relative';
+		node.children[0].style.height = window.innerHeight + 'px';
+		
+		// the rest is default except defining the node
+		// add scrollbars to 1st container.
+		node.appendChild(scrollC);
+		scrollC.appendChild(scrollB);
+		
+		// set needed body styles
+		node.style.overflow = 'hidden';
+		node.style.margin = 0;
+		node.style.padding = 0;
+		
+		// make 2nd container the scrollHeight so we can scroll the content
+		divC.style.height = node.children[0].scrollHeight + 'px';
+		
+		// our main container is now the first container
+		node = document.body.children[0];
+	}
+	
 	
 	// start assigning events to the container and scrollbar
 	e = e || window.event;
