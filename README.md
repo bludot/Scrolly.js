@@ -11,7 +11,12 @@ scrolly(document.body.querySelector('.test'));
 scrolly(document.body.querySelector('.test2'));
 ~~~
 
-Thats it folks :D
+Warning:
+========
+Putting Scrolly.js on the body tag with disable other scrolling of elements inside of the body.
+Fix coming soon.
+
+
 
 Demo:
 ======
@@ -22,6 +27,7 @@ http://bludotos.com/test/scrollbar/test.html
 To Do List:
 ===========
 
+- [ ] fix Scrolly.js on body tag.
 - [ ] enable black list scrolling.
 - [ ] add horizontal scrolling.
 - [ ] make sure works correctly in firefox.
