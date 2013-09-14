@@ -12,3 +12,8 @@ scrolly(document.body.querySelector('.test2'));
 ~~~
 
 Thats it folks :D
+
+Demo:
+======
+
+http://bludotos.com/test/scrollbar/test.html
