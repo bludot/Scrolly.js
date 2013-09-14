@@ -325,7 +325,7 @@ function scrolly(node, e)
 	e = e || window.event;
 	
 	//  set scrollbar height
-	scrollB.style.height = (node.clientHeight / node.scrollHeight) * node.clientHeight + 'px';
+	scrollB.style.height = (window.innerHeight / node.scrollHeight) * window.innerHeight + 'px';
 	
 	// on mouse wheeel
 	node.addEventListener('mousewheel',  function(e) {
