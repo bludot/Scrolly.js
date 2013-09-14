@@ -4,6 +4,7 @@ function scrolly(node, e)
 	var scroll = function(node, black, e)
 	{
 		e = e || window.event;
+		
 		// check blacklist for nodes you dont want scrolled
 		if(black.indexOf(e.target.className) === -1 || black.indexOf(e.target.tagName) === -1 || node.running)
 		{
@@ -12,16 +13,20 @@ function scrolly(node, e)
 			clearInterval(node.timeout);
 			scrollB.style.opacity = 1;
 			window.tempit = node;
+			
 			// mousewheel
 			node.scrollTop += -(e.detail * -10) ? -(e.detail * -10) : -(e.wheelDelta);
+			
 			// set height of scrollbar if content height changes
 			// get percent of content height relative to scrollHeight. multiply by content
 			// height to set the correct scrollbar height
 			scrollB.style.height = (node.clientHeight / node.scrollHeight) * node.clientHeight + 'px';
+			
 			// set offsetTop of the scrollbar when you scroll
 			// percent of scrollTop relative to the height of the content.
 			// then multiplied by the scrollbar height
 			scrollB.style.top = (node.scrollTop / node.clientHeight) * scrollB.clientHeight + 'px';
+			
 			// timeout for scrollbar display
 			// when scrolling stops and doesnt continue: hide the scrollbar
 			node.timeout = setTimeout(function(e)
@@ -33,6 +38,72 @@ function scrolly(node, e)
 		// prevent body scrolling
 		e.preventDefault();
 		return false;
+	};
+	
+	// mousemove event for content
+	var mousemove = function(e) {
+		if(e.clientX>(node.clientWidth-10))
+		{
+			scrollB.style.opacity = 1;
+		} else {
+			if(node.running === false)
+			{
+				scrollB.style.opacity = 0;
+			}
+		}
+	};
+	
+	
+	// mousedown event for scrollbar mouse down
+	var mousedown = function(e) {
+		
+		// prevent text selection
+		e.preventDefault();
+		
+		// scrollbar is being used
+		node.running = true;
+		
+		// save coordinates for later use (find change of mouse movement)
+		var tempY = e.pageY;
+		var tempTop = scrollB.offsetTop;
+		
+		// local mousemove event for scrollbar
+		var mousemove = function(e) {
+			
+			// temp variable to use when checking if the scrollbar is too high or too low
+			var styleTop = tempTop-(tempY-e.pageY);
+			
+			// set the scrollbar offsetTop
+			scrollB.style.top = (styleTop > 0 && styleTop < (node.clientHeight - scrollB.clientHeight)) ? styleTop + 'px' : scrollB.offsetTop;
+			
+			// set the scrollTop of content if it is greater than '0'
+			var setTop = (scrollB.offsetTop / scrollB.clientHeight) * node.clientHeight;
+			node.scrollTop = setTop > 0 ? setTop : 0;
+			
+			// prevent text selection
+			e.preventDefault();
+		};
+		
+		
+		// move scrollbar when mouse down and mouse move
+		window.addEventListener('mousemove', mousemove, false);
+		
+		// cancel mouse movement
+		window.addEventListener('mouseup', function(e) {
+			node.running = false;
+			window.removeEventListener('mousemove', mousemove, false);
+		}, false);
+	};
+	
+	// mouseout event for content
+	var mouseout = function(e) {
+		if(!node.running)
+		{
+			scrollB.style.opacity = 0;
+		}
+		scrollB.addEventListener('mouseover', function(e) {
+			scrollB.style.opacity = 1;
+		}, false);
 	};
 	
 	
@@ -100,66 +171,11 @@ function scrolly(node, e)
 	}, false);
 	
 	// on mouse move for showing scrollbar near the side
-	node.onmousemove = function(e) {
-		if(e.clientX>(node.clientWidth-10))
-		{
-			scrollB.style.opacity = 1;
-		} else {
-			if(node.running === false)
-			{
-				scrollB.style.opacity = 0;
-			}
-		}
-	};
+	node.addEventListener('mousemove', mousemove, false);
 	
 	//  on mouse down for clicking on the scrollbar
-	scrollB.onmousedown = function(e) {
-		
-		// prevent text selection
-		e.preventDefault();
-		
-		// scrollbar is being used
-		node.running = true;
-		
-		// save coordinates for later use (find change of mouse movement)
-		var tempY = e.pageY;
-		var tempTop = scrollB.offsetTop;
-
-		// move scrollbar when mouse down and mouse move
-		window.onmousemove = function(e) {
-			
-			// temp variable to use when checking if the scrollbar is too high or too low
-			var styleTop = tempTop-(tempY-e.pageY);
-			
-			// set the scrollbar offsetTop
-			scrollB.style.top = (styleTop > 0 && styleTop < (node.clientHeight - scrollB.clientHeight)) ? styleTop + 'px' : scrollB.offsetTop;
-			
-			// set the scrollTop of content if it is greater than '0'
-			var setTop = (scrollB.offsetTop / scrollB.clientHeight) * node.clientHeight;
-			node.scrollTop = setTop > 0 ? setTop : 0;
-			
-			// prevent text selection
-			e.preventDefault();
-		};
-		
-		// cancel mouse movement
-		window.onmouseup = function(e) {
-			node.running = false;
-			document.onselectstart = function(e) {
-				return true;
-			};
-			window.onmousemove = null;
-		};
-	};
+	scrollB.addEventListener('mousedown', mousedown, false);
 	
 	// mouse out hide scrollbar
-	node.onmouseout = function(e) {
-		if(!node.running)
-		{
-			scrollB.style.opacity = 0;
-		}
-		scrollB.onmouseover = function() {
-			scrollB.style.opacity = 1;
-		};
-	};
+	node.addEventListener('mouseout', mouseout, false);
 }
