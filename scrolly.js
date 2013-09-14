@@ -111,23 +111,43 @@ function scrolly(node, e)
 	var div = document.createElement('div');
 	div.className = 'content';
 	
-	// get classname of the node to get the style
-	var className  = node.className;
-	var tmpstyle = '';
-	
 	// function to get the style of the content
-	function getStyle(className) {
+	var getStyleClass = function(className) {
 		var classes = document.styleSheets[0].rules || document.styleSheets[0].cssRules;
 		for(var x=0;x<classes.length;x++) {
 			if(classes[x].selectorText === className) {
 				return (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText;
 			}
 		}
+	};
+	
+	var getStyleId = function(id) {
+		var classes = document.styleSheets[0].rules || document.styleSheets[0].cssRules;
+		for(var x=0;x<classes.length;x++) {
+			if(classes[x].selectorText === id) {
+				return (classes[x].cssText) ? classes[x].cssText : classes[x].style.cssText;
+			}
+		}
+	};
+	
+	var tmpstyle = '';
+	
+	// get classname of the node to get the style
+	if(node.className.length > 0)
+	{
+		var className  = node.className;
+		tmpstyle = getStyleClass('.'+className);
+		tmpstyle = tmpstyle.split('{ ')[1].split(' }')[0];
+	} else if(node.id.length > 0)
+	{
+		var id = node.id;
+		tmpstyle = getStyleClass('#'+id);
+		tmpstyle = tmpstyle.split('{ ')[1].split(' }')[0];
+	} else {
+		tmpstyle = window.getComputedStyle(node).cssText;
 	}
 	
 	// set style of content to container
-	tmpstyle = getStyle('.test');
-	tmpstyle = tmpstyle.split('{ ')[1].split(' }')[0];
 	div.style.cssText = tmpstyle;
 	div.style.overflow = 'hidden';
 	
