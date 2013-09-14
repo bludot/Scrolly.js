@@ -118,6 +118,6 @@ function scrolly(node, e)
 		}
 		node.parentNode.querySelector('.scrollbar').onmouseover = function() {
 			node.parentNode.querySelector('.scrollbar').style.opacity = 1;
-		}
+		};
 	};
 }
