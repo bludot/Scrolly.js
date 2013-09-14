@@ -9,13 +9,9 @@ function scrolly(node, e)
 		body = true;
 	}
 	// function to scroll on mouse wheel
-	var scroll = function(node, black, e)
+	var scroll = function(node, e)
 	{
 		e = e || window.event;
-		
-		// check blacklist for nodes you dont want scrolled
-		if(black.indexOf(e.target.className) === -1 || black.indexOf(e.target.tagName) === -1 || node.running)
-		{
 			// set node.running for scrollbar display
 			node.running = true;
 			clearInterval(node.timeout);
@@ -39,10 +35,60 @@ function scrolly(node, e)
 			// when scrolling stops and doesnt continue: hide the scrollbar
 			node.timeout = setTimeout(function(e)
 			{
-				delete node.running;
+				node.running = false;
 				scrollB.style.opacity = 0;
-			},500);
-		}
+			}, 500);
+		// prevent body scrolling
+		e.preventDefault();
+		return false;
+	};
+	
+	
+	// scroll for body tag
+	var bscroll = function(node, e)
+	{
+		e = e || window.event;
+			// set node.running for scrollbar display
+			node.running = true;
+			clearInterval(node.timeout);
+			scrollB.style.opacity = 1;
+			
+			// mousewheel
+			if(isFirefox)
+			{
+				document.documentElement.scrollTop += -(e.detail * -10) ? -(e.detail * -10) : -(e.wheelDelta);
+			} else {
+				node.scrollTop += -(e.detail * -10) ? -(e.detail * -10) : -(e.wheelDelta);
+			}
+			
+			// set height of scrollbar if content height changes
+			// get percent of content height relative to scrollHeight. multiply by content
+			// height to set the correct scrollbar height
+			if(isFirefox)
+			{
+				scrollB.style.height = (window.innerHeight / document.documentElement.scrollHeight) * window.innerHeight + 'px';
+			}else {
+				scrollB.style.height = (window.innerHeight / node.scrollHeight) * window.innerHeight + 'px';
+			}
+			
+			// set offsetTop of the scrollbar when you scroll
+			// percent of scrollTop relative to the height of the content.
+			// then multiplied by the scrollbar height
+			if(isFirefox)
+			{
+				scrollB.style.top = (document.documentElement.scrollTop / window.innerHeight) * scrollB.clientHeight + 'px';
+			} else {
+				scrollB.style.top = (node.scrollTop / window.innerHeight) * scrollB.clientHeight + 'px';
+			}
+			
+			
+			// timeout for scrollbar display
+			// when scrolling stops and doesnt continue: hide the scrollbar
+			node.timeout = setTimeout(function(e)
+			{
+				node.running = false;
+				scrollB.style.opacity = 0;
+			}, 500);
 		// prevent body scrolling
 		e.preventDefault();
 		return false;
@@ -82,7 +128,7 @@ function scrolly(node, e)
 			var styleTop = tempTop-(tempY-e.pageY);
 			
 			// set the scrollbar offsetTop
-			scrollB.style.top = (styleTop > 0 && styleTop < (node.clientHeight - scrollB.clientHeight)) ? styleTop + 'px' : scrollB.offsetTop;
+			scrollB.style.top = (styleTop > 0 && styleTop < (node.clientHeight - scrollB.clientHeight)) ? styleTop + 'px' : scrollB.offsetTop + 'px';
 			
 			// set the scrollTop of content if it is greater than '0'
 			var setTop = (scrollB.offsetTop / scrollB.clientHeight) * node.clientHeight;
@@ -100,6 +146,52 @@ function scrolly(node, e)
 		window.addEventListener('mouseup', function(e) {
 			node.running = false;
 			window.removeEventListener('mousemove', mousemove, false);
+		}, false);
+	};
+	
+	// mousedown for body tag
+	var bmousedown = function(e) {
+		
+		// prevent text selection
+		e.preventDefault();
+		
+		// scrollbar is being used
+		node.running = true;
+		
+		// save coordinates for later use (find change of mouse movement)
+		var tempY = e.clientY;
+		var tempTop = scrollB.offsetTop;
+		
+		// local mousemove event for scrollbar
+		var bmousemove = function(e) {
+			
+			// temp variable to use when checking if the scrollbar is too high or too low
+			var styleTop = tempTop-(tempY-e.clientY);
+			
+			// set the scrollbar offsetTop
+			scrollB.style.top = (styleTop > 0 && styleTop < (window.innerHeight - scrollB.clientHeight)) ? styleTop + 'px' : scrollB.offsetTop + 'px';
+			
+			// set the scrollTop of content if it is greater than '0'
+			var setTop = (scrollB.offsetTop / scrollB.clientHeight) * window.innerHeight;
+			if(isFirefox)
+			{
+				document.documentElement.scrollTop = setTop > 0 ? setTop : 0;
+			} else {
+				node.scrollTop = setTop > 0 ? setTop : 0;
+			}
+			
+			// prevent text selection
+			e.preventDefault();
+		};
+		
+		
+		// move scrollbar when mouse down and mouse move
+		window.addEventListener('mousemove', bmousemove, false);
+		
+		// cancel mouse movement
+		window.addEventListener('mouseup', function(e) {
+			node.running = false;
+			window.removeEventListener('mousemove', bmousemove, false);
 		}, false);
 	};
 	
@@ -142,22 +234,26 @@ function scrolly(node, e)
 	
 	var tmpstyle = '';
 	
+	var isFirefox = typeof InstallTrigger !== 'undefined';
+	
 	// get classname of the node to get the style
 	if(node.className)
 	{
 		var className  = node.className;
 		tmpstyle = getStyleClass('.'+className);
-		console.log(tmpstyle);
 		tmpstyle = tmpstyle.split('{ ')[1].split(' }')[0];
 	} else if(node.id)
 	{
 		var id = node.id;
 		tmpstyle = getStyleClass('#'+id);
-		console.log(tmpstyle);
-		tmpstyle = tmpstyle.split('{ ')[1].split(' }')[0];
-	} else if(!node.className && !node.id) {
-		tmpstyle = window.getComputedStyle(node).cssText;
-		console.log(tmpstyle);
+		if(tmpstyle)
+		{
+			tmpstyle = tmpstyle.split('{ ')[1].split(' }')[0];
+		} else {
+			tmpstyle = node.style.cssText;
+		}
+	} else if(!node.className && !node.id && !isFirefox) {
+		tmpstyle = node.style.cssText;
 	}
 	
 	// set style of content to container
@@ -206,32 +302,10 @@ function scrolly(node, e)
 		}
 	} else {
 		
-		// body cannot be contained or be a container
-		
-		// copy body elements
-		var tmpbody = node.innerHTML;
-		
-		// make new container for content twice
-		var divC = div.cloneNode(true);
-		
-		// empty body innerHTML
-		//node.innerHTML = '';
-		
-		// add both containers
-		//node.appendChild(div);
-		
-		// add second container to hold body contents
-		//div.appendChild(divC);
-		
-		// set second container styles to enable scrolling
-		divC.style.position = 'relative';
-		divC.innerHTML = tmpbody;
 		node.style.position = 'relative';
-		node.style.height = window.innerHeight + 'px';
-		node.children[0].style.position = 'relative';
-		node.children[0].style.height = window.innerHeight + 'px';
+		node.style.height = '100%';
+
 		
-		// add scrollbars to 1st container.
 		node.appendChild(scrollC);
 		scrollC.appendChild(scrollB);
 		
@@ -240,11 +314,10 @@ function scrolly(node, e)
 		node.style.margin = 0;
 		node.style.padding = 0;
 		
-		// make 2nd container the scrollHeight so we can scroll the content
-		//divC.style.height = node.children[0].scrollHeight + 'px';
 		
 		
 		scrollC.style.position = 'fixed';
+		scrollC.style.height = window.innerHeight + 'px';
 		// our main container is now the first container
 		//node = document.body.children[0];
 		node = document.body;
@@ -256,29 +329,27 @@ function scrolly(node, e)
 	scrollB.style.height = (node.clientHeight / node.scrollHeight) * node.clientHeight + 'px';
 	
 	// on mouse wheeel
-	window.addEventListener('mousewheel',  function(e) {
-		console.log(e.target.tagName);
+	node.addEventListener('mousewheel',  function(e) {
 		if(!e.target.className || e.target.className.split(' ')[0] !== 'Scrolly')
 		{
-			scroll(node, [], e);
+			bscroll(node, e);
 		}
 	}, false);
-	window.addEventListener('DOMMouseScroll',  function(e) {
+	node.addEventListener('DOMMouseScroll',  function(e) {
 		if(!e.target.className || e.target.className.split(' ')[0] !== 'Scrolly')
 		{
-			console.log(e.target.className.split(' '));
-			scroll(node, [], e);
+			bscroll(node, e);
 		}
 	}, false);
 	
 	// on mouse move for showing scrollbar near the side
-	//node.addEventListener('mousemove', mousemove, false);
+	node.addEventListener('mousemove', mousemove, false);
 	
 	//  on mouse down for clicking on the scrollbar
-	scrollB.addEventListener('mousedown', mousedown, false);
+	scrollB.addEventListener('mousedown', bmousedown, false);
 	
 	// mouse out hide scrollbar
-	//node.addEventListener('mouseout', mouseout, false);
+	node.addEventListener('mouseout', mouseout, false);
 	return false;
 		
 	}
@@ -292,10 +363,10 @@ function scrolly(node, e)
 	
 	// on mouse wheeel
 	node.addEventListener('mousewheel',  function(e) {
-		scroll(node, ['body'], e);
+		scroll(node, e);
 	}, false);
 	node.addEventListener('DOMMouseScroll',  function(e) {
-		scroll(node, ['body'], e);
+		scroll(node, e);
 	}, false);
 	
 	// on mouse move for showing scrollbar near the side
