@@ -1,5 +1,8 @@
 function scrolly(node, e)
 {
+	
+	e = e || window.event;
+	
 	var body = false;
 	if(node === document.body)
 	{
@@ -185,6 +188,8 @@ function scrolly(node, e)
 	if(!body)
 	{
 		node.parentNode.appendChild(div);
+		var tmp = div.className;
+		div.className = 'Scrolly '+tmp;
 		node.parentNode.removeChild(node);
 		div.appendChild(scrollC);
 		scrollC.appendChild(scrollB);
@@ -192,6 +197,13 @@ function scrolly(node, e)
 		tmpdiv.style.height = div.clientHeight + 'px';
 		node = tmpdiv;
 		node.style.width = 'auto';
+		tmp = node.className;
+		node.className = 'Scrolly '+tmp;
+		for(var i =0; i < node.parentNode.querySelectorAll('*').length; i++)
+		{
+			tmp = node.parentNode.querySelectorAll('*')[i].className;
+			node.parentNode.querySelectorAll('*')[i].className = 'Scrolly '+tmp;
+		}
 	} else {
 		
 		// body cannot be contained or be a container
@@ -203,13 +215,13 @@ function scrolly(node, e)
 		var divC = div.cloneNode(true);
 		
 		// empty body innerHTML
-		node.innerHTML = '';
+		//node.innerHTML = '';
 		
 		// add both containers
-		node.appendChild(div);
+		//node.appendChild(div);
 		
 		// add second container to hold body contents
-		div.appendChild(divC);
+		//div.appendChild(divC);
 		
 		// set second container styles to enable scrolling
 		divC.style.position = 'relative';
@@ -229,10 +241,46 @@ function scrolly(node, e)
 		node.style.padding = 0;
 		
 		// make 2nd container the scrollHeight so we can scroll the content
-		divC.style.height = node.children[0].scrollHeight + 'px';
+		//divC.style.height = node.children[0].scrollHeight + 'px';
 		
+		
+		scrollC.style.position = 'fixed';
 		// our main container is now the first container
-		node = document.body.children[0];
+		//node = document.body.children[0];
+		node = document.body;
+		
+		// start assigning events to the container and scrollbar
+	e = e || window.event;
+	
+	//  set scrollbar height
+	scrollB.style.height = (node.clientHeight / node.scrollHeight) * node.clientHeight + 'px';
+	
+	// on mouse wheeel
+	window.addEventListener('mousewheel',  function(e) {
+		console.log(e.target.tagName);
+		if(!e.target.className || e.target.className.split(' ')[0] !== 'Scrolly')
+		{
+			scroll(node, [], e);
+		}
+	}, false);
+	window.addEventListener('DOMMouseScroll',  function(e) {
+		if(!e.target.className || e.target.className.split(' ')[0] !== 'Scrolly')
+		{
+			console.log(e.target.className.split(' '));
+			scroll(node, [], e);
+		}
+	}, false);
+	
+	// on mouse move for showing scrollbar near the side
+	//node.addEventListener('mousemove', mousemove, false);
+	
+	//  on mouse down for clicking on the scrollbar
+	scrollB.addEventListener('mousedown', mousedown, false);
+	
+	// mouse out hide scrollbar
+	//node.addEventListener('mouseout', mouseout, false);
+	return false;
+		
 	}
 	
 	
