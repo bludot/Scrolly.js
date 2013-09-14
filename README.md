@@ -22,6 +22,7 @@ http://bludotos.com/test/scrollbar/test.html
 To Do List:
 ===========
 
-- [ ] enable black list scrolling
-- [ ] add horizontal scrolling
-- [ ] make sure works correctly in firefox
+- [ ] enable black list scrolling.
+- [ ] add horizontal scrolling.
+- [ ] make sure works correctly in firefox.
+- [x] make css styling work correctly with id, classname, and neither.
