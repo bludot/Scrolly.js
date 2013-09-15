@@ -8,10 +8,47 @@ function scrolly(node, e)
 	{
 		body = true;
 	}
+	
+	// clone nodes
+	var cloneNodes = function( orgNode ){
+		var orgNodeEvenets = orgNode.getElementsByTagName('*');
+		var cloneNode = orgNode.cloneNode( true );
+		var cloneNodeEvents = cloneNode.getElementsByTagName('*');
+
+		var allEvents = new Array('onabort','onbeforecopy','onbeforecut','onbeforepaste','onblur','onchange','onclick',
+			'oncontextmenu','oncopy','ondblclick','ondrag','ondragend','ondragenter', 'ondragleave' ,
+			'ondragover','ondragstart', 'ondrop','onerror','onfocus','oninput','oninvalid','onkeydown',
+			'onkeypress', 'onkeyup','onload','onmousedown','onmousemove','onmouseout',
+			'onmouseover','onmouseup', 'onmousewheel', 'onpaste','onreset', 'onresize','onscroll','onsearch', 'onselect','onselectstart','onsubmit','onunload');
+		
+		
+		// The node root
+		for( var j=0; j<allEvents.length ; j++ ){
+			if( orgNode[allEvents[j]] )
+			{
+				cloneNode[allEvents[j]] = orgNode[allEvents[j]];
+			}
+		}
+		
+		// Node descendants
+		for( var i=0 ; i<orgNodeEvenets.length ; i++ ){
+			for( var j=0; j<allEvents.length ; j++ ){
+				if( orgNodeEvenets[i][allEvents[j]] )
+				{
+					cloneNodeEvents[i][allEvents[j]] = orgNodeEvenets[i][allEvents[j]];
+				}
+			}
+		}
+		
+		return cloneNode;
+	};
+	
+	
 	// function to scroll on mouse wheel
 	var scroll = function(node, e)
 	{
 		e = e || window.event;
+		e.preventDefault();
 			// set node.running for scrollbar display
 			node.running = true;
 			clearInterval(node.timeout);
@@ -19,7 +56,14 @@ function scrolly(node, e)
 			window.tempit = node;
 			
 			// mousewheel
-			node.scrollTop += -(e.detail * -10) ? -(e.detail * -10) : -(e.wheelDelta);
+			if(!e.touches)
+			{
+				node.scrollTop += -(e.detail * -10) ? -(e.detail * -10) : -(e.wheelDelta);
+			} else {
+				var place = node.clientHeight / (-(e.touches[0].clientY-node.tmp));
+				node.last = (e.touches[0].clientY-node.tmp);
+				node.scrollTop += (place);
+			}
 			
 			// set height of scrollbar if content height changes
 			// get percent of content height relative to scrollHeight. multiply by content
@@ -38,8 +82,6 @@ function scrolly(node, e)
 				node.running = false;
 				scrollB.style.opacity = 0;
 			}, 500);
-		// prevent body scrolling
-		e.preventDefault();
 		return false;
 	};
 	
@@ -240,7 +282,12 @@ function scrolly(node, e)
 	{
 		var className  = node.className;
 		tmpstyle = getStyleClass('.'+className);
-		tmpstyle = tmpstyle.split('{ ')[1].split(' }')[0];
+		if(tmpstyle)
+		{
+			tmpstyle = tmpstyle.split('{ ')[1].split(' }')[0];
+		} else {
+			tmpstyle = node.style.cssText;
+		}
 	} else if(node.id)
 	{
 		var id = node.id;
@@ -256,10 +303,14 @@ function scrolly(node, e)
 	}
 	
 	// set style of content to container
+	console.log(tmpstyle);
 	div.style.cssText = tmpstyle;
 	div.style.overflow = 'hidden';
-	div.style.marginLeft = 0;
-	div.style.marginRight = 0;
+	if(div.style.margin)
+	{
+		div.style.marginLeft = 0;
+		div.style.marginRight = 0;
+	}
 	
 	// add scrollcontainer
 	var scrollC = document.createElement('div');
@@ -272,8 +323,8 @@ function scrolly(node, e)
 	scrollB.style.cssText = 'position: relative;width: 6px;height: 100%;right: 0px;background: #222;border: 1px solid #C1C1C1;z-index: 3;top: 0px;opacity:0;-webkit-transition: opacity .5s ease;height:10px;top:0px;';
 	
 	// copy content node to add to the container
-	var tmpdiv = node.cloneNode(true);
-	tmpdiv.className = '';
+	var tmpdiv = cloneNodes(node);
+	//tmpdiv.className = node.className;
 	
 	// restore style
 	tmpdiv.style.cssText = tmpstyle;
@@ -282,23 +333,33 @@ function scrolly(node, e)
 	// create container with scrollbar and content
 	if(!body)
 	{
+		var tmpclass = node.className;
+		var tmpid = node.id;
 		node.parentNode.appendChild(div);
-		var tmp = div.className;
-		div.className = 'Scrolly '+tmp;
+		//var tmp = div.className;
+		div.className = 'Scrolly';
 		node.parentNode.removeChild(node);
 		div.appendChild(scrollC);
 		scrollC.appendChild(scrollB);
 		div.appendChild(tmpdiv);
-		tmpdiv.style.height = div.clientHeight + 'px';
+		if(tmpdiv.style.position === "absolute")
+		{
+			tmpdiv.style.top = 0+'px';
+		}
+		if(div.clientHeight !== 0)
+		{
+			tmpdiv.style.height = div.clientHeight + 'px';
+		}
 		node = tmpdiv;
 		node.style.width = 'auto';
-		tmp = node.className;
-		node.className = 'Scrolly '+tmp;
 		for(var i =0; i < node.parentNode.querySelectorAll('*').length; i++)
 		{
-			tmp = node.parentNode.querySelectorAll('*')[i].className;
-			node.parentNode.querySelectorAll('*')[i].className = 'Scrolly '+tmp;
+			var temp = node.parentNode.querySelectorAll('*')[i].className;
+			node.parentNode.querySelectorAll('*')[i].className = 'Scrolly '+temp;
 		}
+		node.className = 'Scrolly '+tmpclass;
+		node.id = tmpid;
+		div.children = div.children[1].children;
 	} else {
 		
 		node.style.position = 'relative';
@@ -369,6 +430,41 @@ function scrolly(node, e)
 	}, false);
 	node.parentNode.addEventListener('DOMMouseScroll',  function(e) {
 		scroll(node, e);
+	}, false);
+	
+	node.parentNode.addEventListener('touchmove', function(e) {
+		e.preventDefault();
+		scroll(node, e);
+	}, false);
+	
+	node.parentNode.addEventListener('touchstart', function(e) {
+		e.preventDefault();
+		node.tmp = e.touches[0].clientY;
+		var d = new Date();
+		node.time = d.getTime();
+	}, false);
+	
+	node.parentNode.addEventListener('touchend', function(e) {
+		e.preventDefault();
+		/*var d = new Date();
+		var time = d.getTime()-node.time;
+		var num = (node.last);
+		console.log(time);
+		num*=time;
+		node.interval = setInterval(function() {
+			if(num > 0)
+			{
+				num--;
+			} else {
+				num++;
+			}
+			node.scrollTop -= num;
+			if(num > -1 && num < 1)
+			{
+				window.clearInterval(node.interval);
+			}
+		}, time);*/
+		node.tmp = 0;
 	}, false);
 	
 	// on mouse move for showing scrollbar near the side
