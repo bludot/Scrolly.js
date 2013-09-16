@@ -58,7 +58,7 @@ function scrolly(node, e)
 			// mousewheel
 			if(!e.touches)
 			{
-				node.scrollTop += -(e.detail * -10) ? -(e.detail * -10) : -(e.wheelDelta);
+				node.scrollTop +=  -(e.wheelDelta) ? -(e.wheelDelta) : -(e.detail * -10);
 			} else {
 				var place = node.clientHeight / (-(e.touches[0].clientY-node.tmp));
 				node.last = (e.touches[0].clientY-node.tmp);
@@ -90,6 +90,7 @@ function scrolly(node, e)
 	var bscroll = function(node, e)
 	{
 		e = e || window.event;
+		
 			// set node.running for scrollbar display
 			node.running = true;
 			clearInterval(node.timeout);
@@ -366,7 +367,7 @@ function scrolly(node, e)
 		node.style.height = '100%';
 
 		
-		node.appendChild(scrollC);
+		document.documentElement.appendChild(scrollC);
 		scrollC.appendChild(scrollB);
 		
 		// set needed body styles
