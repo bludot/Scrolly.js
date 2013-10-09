@@ -11,12 +11,6 @@ scrolly(document.body.querySelector('.test'));
 scrolly(document.body.querySelector('.test2'));
 ~~~
 
-Warning:
-========
-Scrolly.js on the body tag has bad bugs right now.
-Fix coming soon.
-
-
 
 Demo:
 ======
