@@ -97,11 +97,32 @@ function scrolly(node, e)
 			scrollB.style.opacity = 1;
 			
 			// mousewheel
-			if(isFirefox)
+			/*if(isFirefox)
 			{
 				document.documentElement.scrollTop += -(e.detail * -10) ? -(e.detail * -10) : -(e.wheelDelta);
 			} else {
 				node.scrollTop += -(e.detail * -10) ? -(e.detail * -10) : -(e.wheelDelta);
+			}*/
+    var delta;
+    if (e.wheelDelta) {
+      if(isFirefox) {
+        delta = e.wheelDelta / 1;
+      } else {
+        delta = e.wheelDelta / 1;
+      }
+    } else if (e.detail) {
+      if(isFirefox) {
+        delta = -e.detail * 10;
+      } else {
+        delta = -e.detail / 3;
+      }
+    }
+    
+    if(isFirefox)
+			{
+				document.documentElement.scrollTop += -delta
+			} else {
+				node.scrollTop += -delta;
 			}
 			
 			// set height of scrollbar if content height changes
@@ -316,7 +337,7 @@ function scrolly(node, e)
 	// add scrollcontainer
 	var scrollC = document.createElement('div');
 	scrollC.className = 'scrollbar-container';
-	scrollC.style.cssText = 'position: absolute;top: 0px;bottom: 0px;right: 10px;width: 10px;padding: 0px;right:0px;';
+	scrollC.style.cssText = 'position: absolute;top: 0px;bottom: 0px;right: 10px;width: 10px;padding: 0px;right:0px;z-index:99999';
 	
 	// add scrollbar
 	var scrollB = document.createElement('div');
@@ -379,6 +400,7 @@ function scrolly(node, e)
 		
 		scrollC.style.position = 'fixed';
 		scrollC.style.height = window.innerHeight + 'px';
+		scrollC.style.zIndex = 99999;
 		// our main container is now the first container
 		//node = document.body.children[0];
 		node = document.body;
