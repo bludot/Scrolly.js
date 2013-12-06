@@ -106,15 +106,15 @@ function scrolly(node, e)
     var delta;
     if (e.wheelDelta) {
       if(isFirefox) {
-        delta = e.wheelDelta / 1;
+        delta = e.wheelDelta / 10;
       } else {
-        delta = e.wheelDelta / 1;
+        delta = e.wheelDelta / 3;
       }
     } else if (e.detail) {
       if(isFirefox) {
         delta = -e.detail * 10;
       } else {
-        delta = -e.detail / 3;
+        delta = -e.detail / 10;
       }
     }
     
